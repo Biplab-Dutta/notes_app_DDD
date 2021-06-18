@@ -1,5 +1,6 @@
 import 'package:dartz/dartz.dart';
 import 'package:equatable/equatable.dart';
+import 'package:notes_app/domain/core/errors.dart';
 import 'package:notes_app/domain/core/failures.dart';
 import 'package:notes_app/domain/core/value_validators.dart';
 
@@ -12,6 +13,13 @@ class EmailAddress extends Equatable {
 
   bool isValid() => value.isRight();
 
+  String getOrCrash() {
+    return value.fold(
+      (error) => throw UnexpectedValueError(error),
+      (success) => success,
+    );
+  }
+
   @override
   List<Object> get props => [value];
 }
@@ -23,6 +31,13 @@ class Password extends Equatable {
   const Password._(this.value);
 
   bool isValid() => value.isRight();
+
+  String getOrCrash() {
+    return value.fold(
+      (error) => throw UnexpectedValueError(error),
+      (success) => success,
+    );
+  }
 
   @override
   List<Object> get props => [value];
