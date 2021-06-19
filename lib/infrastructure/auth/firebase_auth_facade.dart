@@ -7,10 +7,11 @@ import 'package:notes_app/domain/auth/i_auth_facade.dart';
 import 'package:notes_app/domain/auth/value_objects.dart';
 
 class FirebaseAuthFacade implements IAuthFacade {
+  FirebaseAuthFacade(this._firebaseAuth, this._googleSignIn);
+
   final FirebaseAuth _firebaseAuth;
   final GoogleSignIn _googleSignIn;
 
-  FirebaseAuthFacade(this._firebaseAuth, this._googleSignIn);
   @override
   Future<Either<AuthFailure, Unit>> registerWithEmailAndPassword({
     required EmailAddress emailAddress,
@@ -26,14 +27,15 @@ class FirebaseAuthFacade implements IAuthFacade {
       );
       return right(unit);
     } on FirebaseAuthException catch (e) {
-      if (e.code == 'email-already-in-use')
+      if (e.code == 'email-already-in-use') {
         return left(
           const AuthFailure.emailAlreadyInUse(),
         );
-      else
+      } else {
         return left(
           const AuthFailure.serverError(),
         );
+      }
     }
   }
 
@@ -52,21 +54,23 @@ class FirebaseAuthFacade implements IAuthFacade {
       );
       return right(unit);
     } on FirebaseAuthException catch (e) {
-      if (e.code == 'user-not-found' || e.code == 'wrong-password')
+      if (e.code == 'user-not-found' || e.code == 'wrong-password') {
         return left(
           const AuthFailure.invalidEmailAndPassword(),
         );
-      else
+      } else {
         return left(
           const AuthFailure.serverError(),
         );
+      }
     }
   }
 
   @override
   Future<Either<AuthFailure, Unit>> signInWithGoogle() async {
     try {
-      final GoogleSignInAccount? googleUser = await _googleSignIn.signIn();
+      final GoogleSignInAccount? googleUser;
+      googleUser = await _googleSignIn.signIn();
       if (googleUser == null) {
         return left(
           const AuthFailure.cancelledByUser(),
