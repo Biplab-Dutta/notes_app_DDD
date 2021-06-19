@@ -1,7 +1,7 @@
 import 'package:notes_app/domain/core/failures.dart';
 
 class UnexpectedValueError extends Error {
-  final ValueFailure valueFailure;
+  final ValueFailure<String> valueFailure;
 
   UnexpectedValueError(this.valueFailure);
 
