@@ -11,6 +11,9 @@ class SignInForm extends StatelessWidget {
       listener: (context, state) {},
       builder: (context, state) {
         return Form(
+          autovalidateMode: state.showErrorMessages == true
+              ? AutovalidateMode.onUserInteraction
+              : AutovalidateMode.disabled,
           child: ListView(
             children: [
               const Text(
@@ -29,6 +32,21 @@ class SignInForm extends StatelessWidget {
                   labelText: 'Email',
                 ),
                 autocorrect: false,
+                onChanged: (value) => context.read<SignInFormBloc>().add(
+                      SignInFormEvent.emailChanged(value),
+                    ),
+                validator: (_) => context
+                    .read<SignInFormBloc>()
+                    .state
+                    .emailAddress
+                    .value
+                    .fold<String?>(
+                      (l) => l.maybeMap(
+                        invalidEmail: (_) => 'Invalid Email',
+                        orElse: () => null,
+                      ),
+                      (r) => null,
+                    ),
               ),
               const SizedBox(
                 height: 8,
@@ -40,6 +58,21 @@ class SignInForm extends StatelessWidget {
                 ),
                 autocorrect: false,
                 obscureText: true,
+                onChanged: (value) => context.read<SignInFormBloc>().add(
+                      SignInFormEvent.passwordChanged(value),
+                    ),
+                validator: (_) => context
+                    .read<SignInFormBloc>()
+                    .state
+                    .password
+                    .value
+                    .fold<String?>(
+                      (l) => l.maybeMap(
+                        shortPassword: (_) => 'Password too short',
+                        orElse: () => null,
+                      ),
+                      (r) => null,
+                    ),
               ),
               const SizedBox(
                 height: 8,
@@ -48,7 +81,12 @@ class SignInForm extends StatelessWidget {
                 children: [
                   Expanded(
                     child: TextButton(
-                      onPressed: () {},
+                      onPressed: () {
+                        context.read<SignInFormBloc>().add(
+                              const SignInFormEvent
+                                  .signInWithEmailAndPasswordPressed(),
+                            );
+                      },
                       child: const Text(
                         'SIGN IN',
                         style: TextStyle(
